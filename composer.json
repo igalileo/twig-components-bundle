@@ -11,9 +11,9 @@
     }
   ],
   "require": {
-    "php":                      ">=5.5.0",
-    "symfony/framework-bundle": "~2.7|~3.0|~4.0",
-    "twig/twig": "^2.5",
+    "php": ">=7.0",
+    "symfony/framework-bundle": "~4.0",
+    "twig/twig": "^3.0",
     "symfony/options-resolver": "^4.1"
   },
   "autoload": {

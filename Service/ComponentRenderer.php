@@ -12,6 +12,10 @@ use Olveneer\TwigComponentsBundle\Exception\MixinNotFoundException;
 use Olveneer\TwigComponentsBundle\Exception\TemplateNotFoundException;
 use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\OptionsResolver\OptionsResolver;
+use Twig\Environment;
+use Twig\Error\LoaderError;
+use Twig\Error\RuntimeError;
+use Twig\Error\SyntaxError;
 
 /**
  * Class ComponentRenderer
@@ -25,7 +29,7 @@ class ComponentRenderer
     private $store;
 
     /**
-     * @var \Twig_Environment
+     * @var Environment
      */
     private $environment;
 
@@ -42,10 +46,10 @@ class ComponentRenderer
     /**
      * ComponentRenderer constructor.
      * @param ComponentStore $componentStore
-     * @param \Twig_Environment $environment
+     * @param Environment $environment
      * @param ConfigStore $configStore
      */
-    public function __construct(ComponentStore $componentStore, \Twig_Environment $environment, ConfigStore $configStore)
+    public function __construct(ComponentStore $componentStore, Environment $environment, ConfigStore $configStore)
     {
         $this->store = $componentStore;
         $this->environment = $environment;
@@ -57,15 +61,16 @@ class ComponentRenderer
     /**
      * Returns the rendered html of a component.
      *
-     * @param $name
+     * @param       $name
      * @param array $props
+     *
      * @return false|string
+     *
      * @throws ComponentNotFoundException
      * @throws TemplateNotFoundException
-     * @throws \Throwable
-     * @throws \Twig_Error_Loader
-     * @throws \Twig_Error_Runtime
-     * @throws \Twig_Error_Syntax
+     * @throws LoaderError
+     * @throws RuntimeError
+     * @throws SyntaxError
      */
     public function renderComponent($name, $props = [])
     {
@@ -124,16 +129,17 @@ class ComponentRenderer
 
     /**
      * Returns a response holding the html of a component.
-     * 
-     * @param $name
+     *
+     * @param       $name
      * @param array $props
+     *
      * @return Response
+     *
      * @throws ComponentNotFoundException
+     * @throws LoaderError
+     * @throws RuntimeError
+     * @throws SyntaxError
      * @throws TemplateNotFoundException
-     * @throws \Throwable
-     * @throws \Twig_Error_Loader
-     * @throws \Twig_Error_Runtime
-     * @throws \Twig_Error_Syntax
      */
     public function render($name, $props = [])
     {
@@ -265,7 +271,7 @@ class ComponentRenderer
     }
 
     /**
-     * @return \Twig_Environment
+     * @return Environment
      */
     public function getEnv()
     {

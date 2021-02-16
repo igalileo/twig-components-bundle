@@ -2,11 +2,17 @@
 
 namespace Olveneer\TwigComponentsBundle\Twig\tag;
 
+use Twig\Error\SyntaxError;
+use Twig\Node\Node;
+use Twig\Token;
+use Twig\TokenParser\AbstractTokenParser;
+
 /**
  * Class SlotParser
+ *
  * @package Olveneer\TwigComponentsBundle\Slot
  */
-class SlotParser extends \Twig_TokenParser
+class SlotParser extends AbstractTokenParser
 {
     /**
      * @var string
@@ -14,11 +20,12 @@ class SlotParser extends \Twig_TokenParser
     private $endTag = 'endslot';
 
     /**
-     * @param \Twig_Token $token
-     * @return SlotNode|\Twig_Node
-     * @throws \Twig_Error_Syntax
+     * @param Token $token
+     *
+     * @return SlotNode|Node
+     * @throws SyntaxError
      */
-    public function parse(\Twig_Token $token)
+    public function parse(Token $token)
     {
         $lineno = $token->getLine();
 
@@ -41,7 +48,7 @@ class SlotParser extends \Twig_TokenParser
                     $continue = false;
                     break;
                 default:
-                    throw new \Twig_Error_Syntax(sprintf("Unexpected end of template. Twig was looking for the following tag '$this->endTag' to close the '$this->endTag' block started at line %d)", $lineno), -1);
+                    throw new SyntaxError(sprintf("Unexpected end of template. Twig was looking for the following tag '$this->endTag' to close the '$this->endTag' block started at line %d)", $lineno), -1);
             }
 
             // you want $body at the beginning of your arguments
@@ -50,28 +57,31 @@ class SlotParser extends \Twig_TokenParser
             // if the endtag can also contains params, you can uncomment this line:
             // $params = array_merge($params, $this->getInlineParams($token));
             // and comment this one:
-            $stream->expect(\Twig_Token::BLOCK_END_TYPE);
+            $stream->expect(Token::BLOCK_END_TYPE);
         }
 
-        return new SlotNode(new \Twig_Node($params), $lineno, $this->getTag());
+        return new SlotNode(new Node($params), $lineno, $this->getTag());
     }
 
     /**
      * Recovers all tag parameters until we find a BLOCK_END_TYPE ( %} )
      *
-     * @param \Twig_Token $token
+     * @param Token $token
      * @return array
-     * @throws \Twig_Error_Syntax
+     * @throws SyntaxError
      */
-    protected function getInlineParams(\Twig_Token $token)
+    protected function getInlineParams(Token $token)
     {
         $stream = $this->parser->getStream();
         $params = [];
-        while (!$stream->test(\Twig_Token::BLOCK_END_TYPE))
+
+        while (!$stream->test(Token::BLOCK_END_TYPE))
         {
             $params[] = $this->parser->getExpressionParser()->parseExpression();
         }
-        $stream->expect(\Twig_Token::BLOCK_END_TYPE);
+
+        $stream->expect(Token::BLOCK_END_TYPE);
+
         return $params;
     }
 
@@ -79,10 +89,10 @@ class SlotParser extends \Twig_TokenParser
      * Callback called at each tag name when subparsing, must return
      * true when the expected end tag is reached.
      *
-     * @param \Twig_Token $token
+     * @param Token $token
      * @return bool
      */
-    public function decideSlotEnd(\Twig_Token $token)
+    public function decideSlotEnd(Token $token)
     {
         return $token->test([$this->endTag]);
     }

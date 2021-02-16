@@ -5,12 +5,15 @@ namespace Olveneer\TwigComponentsBundle\Twig;
 use Olveneer\TwigComponentsBundle\Service\ComponentRenderer;
 use Olveneer\TwigComponentsBundle\Twig\tag\ComponentParser;
 use Olveneer\TwigComponentsBundle\Twig\tag\SlotParser;
+use Twig\Compiler;
+use Twig\Extension\AbstractExtension;
+use Twig\TokenParser\TokenParserInterface;
 
 /**
  * Class SlotExtension
  * @package Olveneer\TwigComponentsBundle\Twig
  */
-class SlotExtension extends \Twig_Extension
+class SlotExtension extends AbstractExtension
 {
     /**
      * @var ComponentRenderer
@@ -27,7 +30,7 @@ class SlotExtension extends \Twig_Extension
     }
 
     /**
-     * @return array|\Twig_TokenParserInterface[]
+     * @return array|TokenParserInterface[]
      */
     public function getTokenParsers()
     {
@@ -43,11 +46,10 @@ class SlotExtension extends \Twig_Extension
     }
 
     /**
-     * @return \Twig_Compiler
+     * @return Compiler
      */
     public function createCompiler()
     {
-        return new \Twig_Compiler($this->renderer->getEnv());
+        return new Compiler($this->renderer->getEnv());
     }
-
 }

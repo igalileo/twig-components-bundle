@@ -2,11 +2,16 @@
 
 namespace Olveneer\TwigComponentsBundle\Twig\tag;
 
+use Twig\Error\SyntaxError;
+use Twig\Token;
+use Twig\TokenParser\AbstractTokenParser;
+
 /**
  * Class SlotTokenParser
+ *
  * @package Olveneer\TwigComponentsBundle\Slot
  */
-class ComponentParser extends \Twig_TokenParser
+class ComponentParser extends AbstractTokenParser
 {
     /**
      * @var string
@@ -14,11 +19,11 @@ class ComponentParser extends \Twig_TokenParser
     private $endTag = 'endget';
 
     /**
-     * @param \Twig_Token $token
+     * @param Token $token
      * @return ComponentNode
-     * @throws \Twig_Error_Syntax
+     * @throws SyntaxError
      */
-    public function parse(\Twig_Token $token)
+    public function parse(Token $token)
     {
         $expr = $this->parser->getExpressionParser()->parseExpression();
 
@@ -29,7 +34,7 @@ class ComponentParser extends \Twig_TokenParser
 
     /**
      * @return array
-     * @throws \Twig_Error_Syntax
+     * @throws SyntaxError
      */
     protected function parseArguments()
     {
@@ -51,7 +56,7 @@ class ComponentParser extends \Twig_TokenParser
             switch ($stream->next()->getValue()) {
                 case 'slot':
                     $name = $stream->getCurrent()->getValue();
-                    $stream->expect(\Twig_Token::NAME_TYPE);
+                    $stream->expect(Token::NAME_TYPE);
 
                     $stream->expect(/* Twig_Token::BLOCK_END_TYPE */ 3);
                     $slotNodes = $this->parser->subparse(array($this, 'decideComponentFork'));
@@ -69,7 +74,7 @@ class ComponentParser extends \Twig_TokenParser
                     break;
 
                 default:
-                    throw new \Twig_Error_Syntax(sprintf('Unexpected end of template. Twig was looking for the following tag "else", "elseif", or "endif" to close the "if" block started at line %d).', $lineno), $stream->getCurrent()->getLine(), $stream->getSourceContext());
+                    throw new SyntaxError(sprintf('Unexpected end of template. Twig was looking for the following tag "else", "elseif", or "endif" to close the "if" block started at line %d).', $lineno), $stream->getCurrent()->getLine(), $stream->getSourceContext());
             }
         }
 
@@ -90,10 +95,10 @@ class ComponentParser extends \Twig_TokenParser
      * Callback called at each tag name when subparsing, must return
      * true when the expected end tag is reached.
      *
-     * @param \Twig_Token $token
+     * @param Token $token
      * @return bool
      */
-    public function decideComponentEnd(\Twig_Token $token)
+    public function decideComponentEnd(Token $token)
     {
         return $token->test([$this->endTag]);
     }
@@ -102,10 +107,10 @@ class ComponentParser extends \Twig_TokenParser
      * Callback called at each tag name when subparsing, must return
      * true when the expected end tag is reached.
      *
-     * @param \Twig_Token $token
+     * @param Token $token
      * @return bool
      */
-    public function decideComponentFork(\Twig_Token $token)
+    public function decideComponentFork(Token $token)
     {
         return $token->test(['slot', 'endslot', $this->endTag]);
     }
